@@ -1,0 +1,13 @@
+using Microsoft.EntityFrameworkCore;
+using DenounceBeats.API.Entities;
+
+namespace DenounceBeats.API.Context
+{
+    public class ApplicationDbContext : DbContext
+    {
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+            : base(options) { }
+
+        public DbSet<Sector> Sectors { get; set; }
+    }
+}
