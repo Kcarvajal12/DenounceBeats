@@ -1,0 +1,78 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using DenounceBeats.API.Context;
+using DenounceBeats.API.DTOs;
+using DenounceBeats.API.Entities;
+
+namespace DenounceBeats.API.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class SectorsController : ControllerBase
+    {
+        private readonly ApplicationDbContext _context;
+
+        public SectorsController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(await _context.Sectors.ToListAsync());
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> Get(int id)
+        {
+            var sector = await _context.Sectors.FindAsync(id);
+            return sector == null ? NotFound() : Ok(sector);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(SectorDto dto)
+        {
+            var sector = new Sector
+            {
+                Name = dto.Name,
+                PostalCode = dto.PostalCode,
+                IsActive = true,
+                MunicipalityId = dto.MunicipalityId,
+                Created = DateTime.Now,
+                Updated = DateTime.Now
+            };
+
+            _context.Sectors.Add(sector);
+            await _context.SaveChangesAsync();
+
+            return Ok(sector);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, SectorDto dto)
+        {
+            var sector = await _context.Sectors.FindAsync(id);
+            if (sector == null) return NotFound();
+
+            sector.Name = dto.Name;
+            sector.PostalCode = dto.PostalCode;
+            sector.MunicipalityId = dto.MunicipalityId;
+            sector.Updated = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+            return Ok(sector);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var sector = await _context.Sectors.FindAsync(id);
+            if (sector == null) return NotFound();
+
+            _context.Sectors.Remove(sector);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+    }
+}
